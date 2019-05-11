@@ -5,12 +5,14 @@ import { IEdgeView, IVertexView } from 'graphlabs.core.template/build/models/gra
 export class Cycle {
 
     name: string;
-    vertices: IVertexView[]; 
+    vertices: IVertexView[];
+    edges: IEdgeView[];
 
-    constructor(name: string, vertices: IVertexView[]) {
+    constructor(name: string, vertices: IVertexView[], edges: IEdgeView[]) {
  
         this.name = name;
         this.vertices = vertices;
+        this.edges = edges;
     }
 
     toString(): string{
