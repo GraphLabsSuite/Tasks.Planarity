@@ -4,23 +4,23 @@ import { IEdgeView, IVertexView } from 'graphlabs.core.template/build/models/gra
 
 export class Segment {
 
-    body_edges: IEdgeView[];
-    body_vertices: IVertexView[];
+    bodyEdges: IEdgeView[];
+    bodyVertices: IVertexView[];
     value: number;
     contactPointOne: IVertexView;
     contactPointTwo: IVertexView;
 
-    constructor(body_edges: IEdgeView[], body_vertices : IVertexView[], contactPointOne: IVertexView, contactPointTwo: IVertexView) {
+    constructor(bodyEdges: IEdgeView[], bodyVertices : IVertexView[], contactPointOne: IVertexView, contactPointTwo: IVertexView) {
  
-        this.body_edges = body_edges;
-        this.body_vertices = body_vertices;
+        this.bodyEdges = bodyEdges;
+        this.bodyVertices = bodyVertices;
         this.contactPointOne = contactPointOne;
         this.contactPointTwo = contactPointTwo;
     }
 
     toString(): string{
-        var str = "segment(" + this.body_vertices.length + ")(" + this.value + "): ";
-        this.body_vertices.forEach( n => str += n.name )
+        var str = "segment(" + this.bodyVertices.length + ")(" + this.value + "): ";
+        this.bodyVertices.forEach( n => str += n.name )
         return str;
     }
 }
