@@ -4,11 +4,11 @@ import { IEdgeView, IVertexView } from 'graphlabs.core.template/build/models/gra
 
 export class Segment {
 
-    bodyEdges: IEdgeView[];
-    bodyVertices: IVertexView[];
-    value: number;
-    contactPointOne: IVertexView;
-    contactPointTwo: IVertexView;
+    bodyEdges: IEdgeView[] = [];
+    bodyVertices: IVertexView[] = [];
+    value: number = null;
+    contactPointOne: IVertexView = null;
+    contactPointTwo: IVertexView = null;
 
     constructor(bodyEdges: IEdgeView[], bodyVertices : IVertexView[], contactPointOne: IVertexView, contactPointTwo: IVertexView) {
  
