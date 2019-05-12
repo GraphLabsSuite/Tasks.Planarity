@@ -6,6 +6,7 @@ import { Graph, Vertex, Edge, VertexJSON } from 'graphlabs.core.graphs';
 import { Cycle } from './Cycle';
 import { element, number } from 'prop-types';
 import { Segment } from './Segment';
+import {ChangeEvent, SyntheticEvent} from "react";
 
 function addK5Edges(){
     const graph = store.getState().graph;
@@ -103,6 +104,14 @@ function graphСheck(){
 
 class App extends TaskTemplate {
 
+    private studentAnswer?: boolean;
+
+    constructor(props: {}) {
+        super(props);
+        this.checkAnswer = this.checkAnswer.bind(this);
+    }
+
+
     public getTaskToolbar() {
         TaskToolbar.prototype.getButtonList = () => {
             ToolButtonList.prototype.help = () => `В данном задании будет выполняться проверка 
@@ -141,13 +150,23 @@ class App extends TaskTemplate {
                     <span> Ответьте на вопрос: <br /><br /> Данный граф является планарным ?<br /></span>
                     <div className="radio">
                     <label>
-                        <input type="radio" value="true" />
+                        <input
+                            type="radio"
+                            value="0"
+                            checked={this.studentAnswer === true}
+                            onChange={this.checkAnswer}
+                        />
                         Да. Данный граф планарен.
                     </label>
                     </div>
                     <div className="radio">
                     <label>
-                        <input type="radio" value="false" />
+                        <input
+                            type="radio"
+                            value="1"
+                            onChange={this.checkAnswer}
+                            checked={this.studentAnswer === false}
+                        />
                         Нет. Данный граф не планарен.
                     </label>
                     </div>
@@ -156,7 +175,12 @@ class App extends TaskTemplate {
                 <span> <br /> <br /> {devstring} </span>
             </div>
             );
-    }   
+    }
+
+    private checkAnswer(value: ChangeEvent<HTMLInputElement>) {
+        this.studentAnswer = value.target.value === '0';
+        super.forceUpdate();
+    }
 }
 
 export default App;
