@@ -2,10 +2,7 @@ import * as React from 'react';
 import { BetaGraph } from './BetaGraph';
 import { store, TaskTemplate, TaskToolbar, ToolButtonList } from 'graphlabs.core.template';
 import { IEdgeView, IVertexView } from 'graphlabs.core.template/build/models/graph';
-import { Graph, Vertex, Edge, VertexJSON } from 'graphlabs.core.graphs';
-import { Cycle } from './Cycle';
-import { element, number } from 'prop-types';
-import { Segment } from './Segment';
+import { Graph, Vertex, Edge } from 'graphlabs.core.graphs';
 import {ChangeEvent, SyntheticEvent} from "react";
 
 function addK5Edges(){
@@ -46,7 +43,7 @@ function addBridge(){
     graph.edges.push(Object.assign({}, newEdge2));
 
     var newEdge3 = graph.edges.slice(0,1);
-    newEdge3.vertexOne = "1";
+    newEdge3.vertexOne = "2";
     newEdge3.vertexTwo = "3";
     graph.edges.push(Object.assign({}, newEdge3));
 
@@ -105,12 +102,24 @@ function graphСheck(){
 class App extends TaskTemplate {
 
     private studentAnswer?: boolean;
+    private planarityResult?: boolean;
 
     constructor(props: {}) {
         super(props);
         this.checkAnswer = this.checkAnswer.bind(this);
     }
 
+    public componentDidMount(){
+
+        graphСheck();
+
+        var betaGraph = new BetaGraph(store.getState().graph.vertices, store.getState().graph.edges);
+        this.planarityResult = betaGraph.checkPlanarity();
+
+        if (this.planarityResult == null){
+            alert("Пожалуйста сообщите об этом преподавателю или лаборанту. Результат проверки на планарность = null");
+        }
+    }
 
     public getTaskToolbar() {
         TaskToolbar.prototype.getButtonList = () => {
@@ -122,27 +131,9 @@ class App extends TaskTemplate {
     }
 
     public task() {
-
+        
         //addK5Edges();
         //addBridge();
-        graphСheck();
-
-        var betaGraph = new BetaGraph(store.getState().graph.vertices, store.getState().graph.edges);
-        var planarityResult = betaGraph.checkPlanarity().toString();
-
-        var devstring = "";
-
-        /* 
-        var listBetaGraph = betaGraph.splitGraphByBridge();
-
-        devstring+=betaGraph;
-        devstring+= "____ После разбиенеия _______";
-        listBetaGraph.forEach( g => devstring += g.toString());
-        */
-
-        if (planarityResult == null){
-            devstring += "Пожалуйста сообщите об этом преподавателю или лаборанту. Результат проверки на планарность = null";
-        }
 
         return () => (
             <div>
@@ -171,8 +162,6 @@ class App extends TaskTemplate {
                     </label>
                     </div>
                 </form>
-                <span> <br /> <br /> {planarityResult} </span>
-                <span> <br /> <br /> {devstring} </span>
             </div>
             );
     }
