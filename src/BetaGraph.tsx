@@ -126,70 +126,70 @@ export class BetaGraph {
         
         this.findSegments();
 
-        var counter = 0;
+        let counter = 0;
         
-        while (this.segments.length != 0 && !this.segments.find(s => s.value == 0) && counter < 100){
+        while (this.segments.length !== 0 && !this.segments.find(s => s.value === 0) && counter < 100){
             counter++;
             this.segments.sort(function(a, b) { return b.value - a.value; });
     
-            var minValueSegment = this.segments.pop();
-            var cutFace = this.faces.splice(this.faces.findIndex( f => f.vertices.find(v => v.name == minValueSegment.contactPointOne.name) != null 
+            let minValueSegment = this.segments.pop();
+            let cutFace = this.faces.splice(this.faces.findIndex( f => f.vertices.find(v => v.name == minValueSegment.contactPointOne.name) != null 
                                                                     && f.vertices.find(v => v.name == minValueSegment.contactPointTwo.name) != null), 1)[0];
-            var contactPointOneIndex = cutFace.vertices.findIndex(v => v.name == minValueSegment.contactPointOne.name);
-            var contactPointTwoIndex = cutFace.vertices.findIndex(v => v.name == minValueSegment.contactPointTwo.name);
+            let contactPointOneIndex = cutFace.vertices.findIndex(v => v.name == minValueSegment.contactPointOne.name);
+            let contactPointTwoIndex = cutFace.vertices.findIndex(v => v.name == minValueSegment.contactPointTwo.name);
     
             this.usedVertices = this.usedVertices.concat(minValueSegment.bodyVertices.slice(1, minValueSegment.bodyVertices.length - 1));
             this.usedEdges = this.usedEdges.concat(minValueSegment.bodyEdges.slice());
     
-            var newVertices1 : IVertexView[];
-            var newVertices2 : IVertexView[];
-            var newEdges1 : IEdgeView[];
-            var newEdges2 : IEdgeView[];
+            let tempVerticesForFirstFace : IVertexView[];
+            let tempVerticesForSecondFace : IVertexView[];
+            let tempEdgesForFirstFace : IEdgeView[];
+            let tempEdgesForSecondFace : IEdgeView[];
     
             if (contactPointOneIndex < contactPointTwoIndex){
-                newVertices1 = cutFace.vertices.slice(0, contactPointOneIndex);
-                newVertices1 = newVertices1.concat(minValueSegment.bodyVertices.slice());
-                newVertices1 = newVertices1.concat(cutFace.vertices.slice(contactPointTwoIndex + 1));
+                tempVerticesForFirstFace = cutFace.vertices.slice(0, contactPointOneIndex);
+                tempVerticesForFirstFace = tempVerticesForFirstFace.concat(minValueSegment.bodyVertices.slice());
+                tempVerticesForFirstFace = tempVerticesForFirstFace.concat(cutFace.vertices.slice(contactPointTwoIndex + 1));
     
-                newEdges1 = cutFace.edges.slice(0, contactPointOneIndex);
-                newEdges1 = newEdges1.concat(minValueSegment.bodyEdges.slice());
-                newEdges1 = newEdges1.concat(cutFace.edges.slice(contactPointTwoIndex));
+                tempEdgesForFirstFace = cutFace.edges.slice(0, contactPointOneIndex);
+                tempEdgesForFirstFace = tempEdgesForFirstFace.concat(minValueSegment.bodyEdges.slice());
+                tempEdgesForFirstFace = tempEdgesForFirstFace.concat(cutFace.edges.slice(contactPointTwoIndex));
     
-                newVertices2 = minValueSegment.bodyVertices.slice();
-                newVertices2 = newVertices2.concat(cutFace.vertices.slice(contactPointOneIndex, contactPointTwoIndex).reverse());
+                tempVerticesForSecondFace = minValueSegment.bodyVertices.slice();
+                tempVerticesForSecondFace = tempVerticesForSecondFace.concat(cutFace.vertices.slice(contactPointOneIndex, contactPointTwoIndex).reverse());
     
-                newEdges2 = minValueSegment.bodyEdges.slice();
-                newEdges2 = newEdges2.concat(cutFace.edges.slice(contactPointOneIndex, contactPointTwoIndex).reverse());
+                tempEdgesForSecondFace = minValueSegment.bodyEdges.slice();
+                tempEdgesForSecondFace = tempEdgesForSecondFace.concat(cutFace.edges.slice(contactPointOneIndex, contactPointTwoIndex).reverse());
     
             } else if (contactPointOneIndex > contactPointTwoIndex){
-                newVertices1 = cutFace.vertices.slice(0, contactPointTwoIndex);
-                newVertices1 = newVertices1.concat(minValueSegment.bodyVertices.slice().reverse());
-                newVertices1 = newVertices1.concat(cutFace.vertices.slice(contactPointOneIndex + 1));
+                tempVerticesForFirstFace = cutFace.vertices.slice(0, contactPointTwoIndex);
+                tempVerticesForFirstFace = tempVerticesForFirstFace.concat(minValueSegment.bodyVertices.slice().reverse());
+                tempVerticesForFirstFace = tempVerticesForFirstFace.concat(cutFace.vertices.slice(contactPointOneIndex + 1));
     
-                newEdges1 = cutFace.edges.slice(0, contactPointTwoIndex);
-                newEdges1 = newEdges1.concat(minValueSegment.bodyEdges.slice().reverse());
-                newEdges1 = newEdges1.concat(cutFace.edges.slice(contactPointOneIndex));
+                tempEdgesForFirstFace = cutFace.edges.slice(0, contactPointTwoIndex);
+                tempEdgesForFirstFace = tempEdgesForFirstFace.concat(minValueSegment.bodyEdges.slice().reverse());
+                tempEdgesForFirstFace = tempEdgesForFirstFace.concat(cutFace.edges.slice(contactPointOneIndex));
     
-                newVertices2 = minValueSegment.bodyVertices.slice().reverse();
-                newVertices2 = newVertices2.concat(cutFace.vertices.slice(contactPointTwoIndex, contactPointOneIndex).reverse());
+                tempVerticesForSecondFace = minValueSegment.bodyVertices.slice().reverse();
+                tempVerticesForSecondFace = tempVerticesForSecondFace.concat(cutFace.vertices.slice(contactPointTwoIndex, contactPointOneIndex).reverse());
     
-                newEdges2 = minValueSegment.bodyEdges.slice().reverse();
-                newEdges2 = newEdges2.concat(cutFace.edges.slice(contactPointTwoIndex, contactPointOneIndex).reverse());
+                tempEdgesForSecondFace = minValueSegment.bodyEdges.slice().reverse();
+                tempEdgesForSecondFace = tempEdgesForSecondFace.concat(cutFace.edges.slice(contactPointTwoIndex, contactPointOneIndex).reverse());
     
             } else if (contactPointOneIndex == contactPointTwoIndex){
-                newVertices1 = cutFace.vertices.slice();
-                newEdges1 = cutFace.edges.slice();
-                newVertices2 = minValueSegment.bodyVertices.slice();
-                newEdges2 = minValueSegment.bodyEdges.slice();
+                tempVerticesForFirstFace = cutFace.vertices.slice();
+                tempEdgesForFirstFace = cutFace.edges.slice();
+                tempVerticesForSecondFace = minValueSegment.bodyVertices.slice();
+                tempEdgesForSecondFace = minValueSegment.bodyEdges.slice();
             }
     
-            this.faces.push(new Cycle(cutFace.name + "0", newVertices1.slice(), newEdges1.slice()), new Cycle(cutFace.name + "1", newVertices2.slice(), newEdges2.slice()));
+            this.faces.push(new Cycle(cutFace.name + "0", tempVerticesForFirstFace.slice(), tempEdgesForFirstFace.slice()), new Cycle(cutFace.name + "1", tempVerticesForSecondFace.slice(), tempEdgesForSecondFace.slice()));
             this.findSegments();
         }
     
-        if (this.segments.length == 0){
+        if (this.segments.length === 0){
             return true;
-        } else if (this.segments.find(s => s.value == 0)){
+        } else if (this.segments.find(s => s.value === 0)){
             return false;
         }
         return null;
@@ -207,8 +207,8 @@ export class BetaGraph {
 
         this.vertices = this.vertices.filter((v: IVertexView) => this.edges.find((e: IEdgeView) => e.vertexOne == v.name || e.vertexTwo == v.name ));
     
-        var numVerticesDeleted: number = 0;
-        var verticesMig; 
+        let numVerticesDeleted: number = 0;
+        let verticesMig; 
         
         do{
             verticesMig = this.vertices.filter((v: IVertexView) => this.edges.filter((e: IEdgeView) => e.vertexOne  === v.name || e.vertexTwo  === v.name).length >= 2 );
@@ -217,7 +217,7 @@ export class BetaGraph {
             
             this.edges = this.edges.filter((e: IEdgeView) => this.vertices.find((v: IVertexView) => v.name === e.vertexOne ) && this.vertices.find((v: IVertexView) => v.name === e.vertexTwo ));
             
-        } while(numVerticesDeleted != 0);
+        } while(numVerticesDeleted !== 0);
 
         return true;
     } 

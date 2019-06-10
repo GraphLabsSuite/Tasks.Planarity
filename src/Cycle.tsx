@@ -4,9 +4,9 @@ import { IEdgeView, IVertexView } from 'graphlabs.core.template/build/models/gra
 
 export class Cycle {
 
-    name: string = null;
-    vertices: IVertexView[] = [];
-    edges: IEdgeView[] = [];
+    public name: string = null;
+    public vertices: IVertexView[] = [];
+    public edges: IEdgeView[] = [];
 
     constructor(name: string, vertices: IVertexView[], edges: IEdgeView[]) {
  
@@ -15,7 +15,7 @@ export class Cycle {
         this.edges = edges;
     }
 
-    toString(): string{
+    public toString(): string{
         let str:string = "";   
         this.vertices.forEach((element: IVertexView) => { 
             str += element.name;             
