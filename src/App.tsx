@@ -186,9 +186,6 @@ class App extends Template {
                         Нет. Данный граф не планарен.
                     </label>
                     </div>
-                    <div>
-                        log. {private_log_h2G4}
-                    </div>
                 </form>
             </div>
             );
