@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Graph, Vertex, Edge } from 'graphlabs.core.graphs';
-import { IEdgeView, IVertexView } from 'graphlabs.core.template/build/models/graph';
+import { IEdgeView, IVertexView } from 'graphlabs.core.template';
 
 export class Segment {
 

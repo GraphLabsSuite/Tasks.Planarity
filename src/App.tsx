@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { BetaGraph } from './BetaGraph';
-import { store, TaskTemplate, TaskToolbar, ToolButtonList } from 'graphlabs.core.template';
-import { IEdgeView, IVertexView } from 'graphlabs.core.template/build/models/graph';
+import { store, Template, Toolbar, ToolButtonList, IEdgeView, IVertexView } from 'graphlabs.core.template';
 import { Graph, Vertex, Edge } from 'graphlabs.core.graphs';
 import {ChangeEvent, SyntheticEvent} from "react";
 
@@ -101,7 +100,7 @@ function graphСheck(){
     });
 }
 
-class App extends TaskTemplate {
+class App extends Template {
 
     private studentAnswer?: boolean;
     private planarityResult?: boolean;
@@ -136,12 +135,12 @@ class App extends TaskTemplate {
     }
 
     public getTaskToolbar() {
-        TaskToolbar.prototype.getButtonList = () => {
+        Toolbar.prototype.getButtonList = () => {
             ToolButtonList.prototype.help = () => `В данном задании будет выполняться проверка 
             планарности графа.`;
             return ToolButtonList;
         };
-        return TaskToolbar;
+        return Toolbar;
     }
 
     public task() {
@@ -160,8 +159,6 @@ class App extends TaskTemplate {
 
         this.componentDidMount();
         private_log_h2G4 += " actual_planarity_result: " + this.planarityResult.toString();
-
-        var trtr: boolean = true;
 
         return () => (
             <div>

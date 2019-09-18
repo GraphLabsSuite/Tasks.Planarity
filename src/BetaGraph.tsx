@@ -1,8 +1,7 @@
-import { IEdgeView, IVertexView } from 'graphlabs.core.template/build/models/graph';
 import { Cycle } from './Cycle';
 import { Graph, Vertex, Edge } from 'graphlabs.core.graphs';
 import { Segment } from './Segment';
-import { store } from 'graphlabs.core.template';
+import { store, IEdgeView, IVertexView  } from 'graphlabs.core.template';
 import { findDOMNode } from 'react-dom';
  
 export class BetaGraph {
