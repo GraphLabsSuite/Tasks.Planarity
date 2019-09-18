@@ -15,6 +15,8 @@ export class BetaGraph {
     private faces: Cycle[] = [];
     private segments: Segment[] = [];
 
+    public private_log_betagraph_6h: string = "";
+
     constructor( vertices: IVertexView[], edges: IEdgeView[]){
         this.vertices = vertices.slice();
         this.edges = edges.slice();
@@ -109,14 +111,17 @@ export class BetaGraph {
         if (splitedGraph.length > 1){
             let result: boolean = true;
             splitedGraph.forEach( g => result = result && g.checkPlanarity())
+            this.private_log_betagraph_6h += " splite_result: " + result;
             return result;
         }
 
         var zeroCycle = this.findCycle();
         if(zeroCycle == null){
+            this.private_log_betagraph_6h += " zero_cycle_is_null_result: " + true;
             return true;
         }
         if(zeroCycle.vertices.length === 0){
+            this.private_log_betagraph_6h += " zero_cycle_is_empty_result: " + true;
             return true;
         }
     
@@ -188,17 +193,21 @@ export class BetaGraph {
         }
     
         if (this.segments.length === 0){
+            this.private_log_betagraph_6h += " segments_is_empty_result: " + true;
             return true;
         } else if (this.segments.find(s => s.value === 0)){
+            this.private_log_betagraph_6h += " segments_NOT_empty_result: " + false;
             return false;
         }
+
+        this.private_log_betagraph_6h += " I_DONT_KNOW_result: " + null;
         return null;
     }
 
     public toString(){
-        let str: string = "Vertices: ";
+        let str: string = "Vertices" + this.vertices.length + ": ";
         this.vertices.forEach(v => str += v.name);
-        str += "Edges: ";
+        str += "Edges" + this.edges.length + ": ";
         this.edges.forEach(e => str += e.vertexOne + e.vertexTwo + " ");
         return str;
     }

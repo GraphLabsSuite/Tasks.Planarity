@@ -5,6 +5,8 @@ import { IEdgeView, IVertexView } from 'graphlabs.core.template/build/models/gra
 import { Graph, Vertex, Edge } from 'graphlabs.core.graphs';
 import {ChangeEvent, SyntheticEvent} from "react";
 
+var private_log_h2G4: string = "start; ";
+
 function addK5Edges(){
     const graph = store.getState().graph;
 
@@ -113,8 +115,20 @@ class App extends TaskTemplate {
 
         graphСheck();
 
+        private_log_h2G4 += " g1.verts: ";
+        store.getState().graph.vertices.forEach((v: Vertex) => {
+            private_log_h2G4 += v.name;
+        });
+        private_log_h2G4 += " g1.edges: ";
+        store.getState().graph.edges.forEach((e: Edge) => {
+            private_log_h2G4 += "-" + e.vertexOne + e.vertexTwo + "-";
+        });
+
         var betaGraph = new BetaGraph(store.getState().graph.vertices, store.getState().graph.edges);
+        private_log_h2G4 += " gBetaGraph: " + betaGraph.toString();
+
         this.planarityResult = betaGraph.checkPlanarity();
+        private_log_h2G4 += betaGraph.private_log_betagraph_6h;
 
         if (this.planarityResult == null){
             alert("Пожалуйста сообщите об этом преподавателю или лаборанту. Результат проверки на планарность = null");
@@ -134,6 +148,20 @@ class App extends TaskTemplate {
         
         //addK5Edges();
         //addBridge();
+
+        private_log_h2G4 += " g0.verts: ";
+        store.getState().graph.vertices.forEach((v: Vertex) => {
+            private_log_h2G4 += v.name;
+        });
+        private_log_h2G4 += " g0.edges: ";
+        store.getState().graph.edges.forEach((e: Edge) => {
+            private_log_h2G4 += "-" + e.vertexOne + e.vertexTwo + "-";
+        });
+
+        this.componentDidMount();
+        private_log_h2G4 += " actual_planarity_result: " + this.planarityResult.toString();
+
+        var trtr: boolean = true;
 
         return () => (
             <div>
@@ -160,6 +188,9 @@ class App extends TaskTemplate {
                         />
                         Нет. Данный граф не планарен.
                     </label>
+                    </div>
+                    <div>
+                        log. {private_log_h2G4}
                     </div>
                 </form>
             </div>
