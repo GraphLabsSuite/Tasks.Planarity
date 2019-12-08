@@ -1,14 +1,13 @@
 import * as React from 'react';
-import { Graph, Vertex, Edge } from 'graphlabs.core.graphs';
-import { IEdgeView, IVertexView } from 'graphlabs.core.template';
+import { IGraph, IVertex, IEdge, Vertex, Graph, Edge } from "graphlabs.core.graphs";
 
 export class Cycle {
 
     public name: string = null;
-    public vertices: IVertexView[] = [];
-    public edges: IEdgeView[] = [];
+    public vertices: IVertex[] = [];
+    public edges: IEdge[] = [];
 
-    constructor(name: string, vertices: IVertexView[], edges: IEdgeView[]) {
+    constructor(name: string, vertices: IVertex[], edges: IEdge[]) {
  
         this.name = name;
         this.vertices = vertices;
@@ -17,7 +16,7 @@ export class Cycle {
 
     public toString(): string{
         let str:string = "";   
-        this.vertices.forEach((element: IVertexView) => { 
+        this.vertices.forEach((element: IVertex) => { 
             str += element.name;             
         });
         return this.name + " : " + str;

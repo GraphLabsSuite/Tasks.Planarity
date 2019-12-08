@@ -1,16 +1,15 @@
 import * as React from 'react';
-import { Graph, Vertex, Edge } from 'graphlabs.core.graphs';
-import { IEdgeView, IVertexView } from 'graphlabs.core.template';
+import { IGraph, IVertex, IEdge, Vertex, Graph, Edge } from "graphlabs.core.graphs";
 
 export class Segment {
 
-    public bodyEdges: IEdgeView[] = [];
-    public bodyVertices: IVertexView[] = [];
+    public bodyEdges: IEdge[] = [];
+    public bodyVertices: IVertex[] = [];
     public value: number = null;
-    public contactPointOne: IVertexView = null;
-    public contactPointTwo: IVertexView = null;
+    public contactPointOne: IVertex = null;
+    public contactPointTwo: IVertex = null;
 
-    constructor(bodyEdges: IEdgeView[], bodyVertices : IVertexView[], contactPointOne: IVertexView, contactPointTwo: IVertexView) {
+    constructor(bodyEdges: IEdge[], bodyVertices : IVertex[], contactPointOne: IVertex, contactPointTwo: IVertex) {
  
         this.bodyEdges = bodyEdges;
         this.bodyVertices = bodyVertices;

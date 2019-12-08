@@ -1,101 +1,123 @@
 import * as React from 'react';
 import { BetaGraph } from './BetaGraph';
-import { store, Template, Toolbar, ToolButtonList, IEdgeView, IVertexView } from 'graphlabs.core.template';
-import { Graph, Vertex, Edge } from 'graphlabs.core.graphs';
-import {ChangeEvent, SyntheticEvent} from "react";
+import { graphModel, Template, Toolbar, ToolButtonList, IEdgeView, IVertexView } from 'graphlabs.core.template';
+import { IGraph, IVertex, IEdge, Vertex, Graph, Edge } from "graphlabs.core.graphs";
+import { ChangeEvent, SyntheticEvent } from "react";
+import { IVertexVisualizer } from 'graphlabs.core.visualizer';
 
 var private_log_h2G4: string = "start; ";
 
 function addK5Edges(){
-    const graph = store.getState().graph;
 
-    var newEdge : IEdgeView = graph.edges.slice(0,1);
-    
-    graph.vertices.forEach((v1: Vertex) => {
-        graph.vertices.forEach((v2: Vertex) => {
-            newEdge.vertexOne = v1.name;
-            newEdge.vertexTwo = v2.name;
-            graph.edges.push(Object.assign({}, newEdge));
+    graphModel.vertices.forEach((v: any) => {
+        graphModel.removeVertex(v);
+    });
+
+    graphModel.edges.forEach((e: any) => {
+        graphModel.removeEdge(e);
+    });
+
+    graphModel.vertices.forEach((v: any) => {
+        graphModel.removeVertex(v);
+    });
+
+    graphModel.edges.forEach((e: any) => {
+        graphModel.removeEdge(e);
+    });
+
+    graphModel.vertices.forEach((v: any) => {
+        graphModel.removeVertex(v);
+    });
+
+    graphModel.edges.forEach((e: any) => {
+        graphModel.removeEdge(e);
+    });
+
+    for (var name in ["0", "1", "2", "3", "4"]){
+        graphModel.addVertex(new Vertex(name));
+    }
+
+    graphModel.vertices.forEach((v1: any) => {
+        graphModel.vertices.forEach((v2: any) => {
+            graphModel.addEdge(new Edge(v1, v2)); //(graphModel.getVertex(v1.name)[0], graphModel.getVertex(v2.name)[0])
         })
     });
 }
 
 function addBridge(){
-    const graph = store.getState().graph;
 
-    var newVertex = graph.vertices.slice(0,1);
-    newVertex.name = "5";
-    graph.vertices.push(newVertex);
+    graphModel.vertices.forEach((v: any) => {
+        graphModel.removeVertex(v);
+    });
 
-    graph.edges.length = 1;
+    graphModel.edges.forEach((e: any) => {
+        graphModel.removeEdge(e);
+    });
 
-    var newEdge0 = graph.edges[0];
-    newEdge0.vertexOne = "0";
-    newEdge0.vertexTwo = "1";
+    graphModel.vertices.forEach((v: any) => {
+        graphModel.removeVertex(v);
+    });
 
-    var newEdge1 = graph.edges.slice(0,1);
-    newEdge1.vertexOne = "1";
-    newEdge1.vertexTwo = "2";
-    graph.edges.push(Object.assign({}, newEdge1));
+    graphModel.edges.forEach((e: any) => {
+        graphModel.removeEdge(e);
+    });
 
-    var newEdge2 = graph.edges.slice(0,1);
-    newEdge2.vertexOne = "0";
-    newEdge2.vertexTwo = "2";
-    graph.edges.push(Object.assign({}, newEdge2));
+    graphModel.vertices.forEach((v: any) => {
+        graphModel.removeVertex(v);
+    });
 
-    var newEdge3 = graph.edges.slice(0,1);
-    newEdge3.vertexOne = "2";
-    newEdge3.vertexTwo = "3";
-    graph.edges.push(Object.assign({}, newEdge3));
+    graphModel.edges.forEach((e: any) => {
+        graphModel.removeEdge(e);
+    });
 
-    var newEdge01 = graph.edges.slice(0,1);
-    newEdge01.vertexOne = "3";
-    newEdge01.vertexTwo = "5";
-    graph.edges.push(Object.assign({}, newEdge01));
+    for (var name in ["0", "1", "2", "3", "4", "5"]){
+        graphModel.addVertex(new Vertex(name));
+    }
 
-    var newEdge11 = graph.edges.slice(0,1);
-    newEdge11.vertexOne = "3";
-    newEdge11.vertexTwo = "4";
-    graph.edges.push(Object.assign({}, newEdge11));
+    graphModel.addEdge(new Edge(graphModel.getVertex("0")[0], graphModel.getVertex("1")[0]));
+    graphModel.addEdge(new Edge(graphModel.getVertex("1")[0], graphModel.getVertex("2")[0]));
+    graphModel.addEdge(new Edge(graphModel.getVertex("2")[0], graphModel.getVertex("0")[0]));
 
-    var newEdge21 = graph.edges.slice(0,1);
-    newEdge21.vertexOne = "5";
-    newEdge21.vertexTwo = "4";
-    graph.edges.push(Object.assign({}, newEdge21));
+    graphModel.addEdge(new Edge(graphModel.getVertex("2")[0], graphModel.getVertex("3")[0]));
+
+    graphModel.addEdge(new Edge(graphModel.getVertex("3")[0], graphModel.getVertex("4")[0]));
+    graphModel.addEdge(new Edge(graphModel.getVertex("4")[0], graphModel.getVertex("5")[0]));
+    graphModel.addEdge(new Edge(graphModel.getVertex("5")[0], graphModel.getVertex("3")[0]));
+
 }
 
 function graphСheck(){
-    const graph = store.getState().graph;
+    //const graph = store.getState().graph;
         
     /** Сheck graph state for defects. */
 
     //Duplicates
 
-    graph.vertices.forEach((element: Vertex, index: Number) => {
-        if (graph.vertices.filter((v: Vertex) => v.name == element.name).length > 1){
-            graph.vertices.splice(index, 1);
+    graphModel.vertices.forEach((element: any, index: number) => {
+        if (graphModel.vertices.filter((v: any) => v.name == element.name).length > 1){
+            graphModel.removeVertex(element); //vertices.splice(index, 1);
         }
     });
     
     // + 2 edges from same vertices
-    graph.edges.forEach((element: IEdgeView, index: Number) => {
-        if (graph.edges.filter((e: IEdgeView) => e.vertexOne == element.vertexOne && e.vertexTwo == element.vertexTwo
+    graphModel.edges.forEach((element: any, index: number) => {
+        if (graphModel.edges.filter((e: any) => e.vertexOne == element.vertexOne && e.vertexTwo == element.vertexTwo
                                                 || e.vertexOne == element.vertexTwo && e.vertexTwo == element.vertexOne).length > 1){
-            graph.edges.splice(index, 1);
+            graphModel.removeEdge(element); //edges.splice(index, 1);
         }
     });
 
     //Edges to nonexistent vertex
-    graph.edges.forEach((element: IEdgeView, index: Number) => {
-        if (!graph.vertices.find((v: Vertex) => v.name == element.vertexOne || v.name == element.vertexTwo)){
-            graph.edges.splice(index, 1);
+    graphModel.edges.forEach((element: any, index: number) => {
+        if (!graphModel.vertices.find((v: any) => v.name == element.vertexOne || v.name == element.vertexTwo)){
+            graphModel.removeEdge(element); //edges.splice(index, 1);
         }
     });
 
     //Zero value edges
-    graph.edges.forEach((element: IEdgeView, index: Number) => {
+    graphModel.edges.forEach((element: any, index: number) => {
         if (element.vertexOne == element.vertexTwo){
-            graph.edges.splice(index, 1);
+            graphModel.removeEdge(element); //edges.splice(index, 1);
         }
     });
 }
@@ -115,15 +137,15 @@ class App extends Template {
         graphСheck();
 
         private_log_h2G4 += " g1.verts: ";
-        store.getState().graph.vertices.forEach((v: Vertex) => {
+        graphModel.vertices.forEach((v: any) => {
             private_log_h2G4 += v.name;
         });
         private_log_h2G4 += " g1.edges: ";
-        store.getState().graph.edges.forEach((e: Edge) => {
-            private_log_h2G4 += "-" + e.vertexOne + e.vertexTwo + "-";
+        graphModel.edges.forEach((e: any) => {
+            private_log_h2G4 += "-" + e.vertexOne.name + e.vertexTwo.name + "-";
         });
 
-        var betaGraph = new BetaGraph(store.getState().graph.vertices, store.getState().graph.edges);
+        var betaGraph = new BetaGraph(graphModel.vertices, graphModel.edges);
         private_log_h2G4 += " gBetaGraph: " + betaGraph.toString();
 
         this.planarityResult = betaGraph.checkPlanarity();
@@ -149,16 +171,19 @@ class App extends Template {
         //addBridge();
 
         private_log_h2G4 += " g0.verts: ";
-        store.getState().graph.vertices.forEach((v: Vertex) => {
+        graphModel.vertices.forEach((v: any) => {
             private_log_h2G4 += v.name;
         });
         private_log_h2G4 += " g0.edges: ";
-        store.getState().graph.edges.forEach((e: Edge) => {
-            private_log_h2G4 += "-" + e.vertexOne + e.vertexTwo + "-";
+        graphModel.edges.forEach((e: any) => {
+            private_log_h2G4 += "-" + e.vertexOne.name + e.vertexTwo.name + "-";
         });
 
         this.componentDidMount();
         private_log_h2G4 += " actual_planarity_result: " + this.planarityResult.toString();
+
+        var graphModelVertices = graphModel.vertices.toString();
+        var graphModelEdges = graphModel.edges.toString();
 
         return () => (
             <div>

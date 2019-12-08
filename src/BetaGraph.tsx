@@ -1,22 +1,21 @@
 import { Cycle } from './Cycle';
-import { Graph, Vertex, Edge } from 'graphlabs.core.graphs';
 import { Segment } from './Segment';
-import { store, IEdgeView, IVertexView  } from 'graphlabs.core.template';
+import { IGraph, IVertex, IEdge, Vertex, Graph, Edge } from "graphlabs.core.graphs";
 import { findDOMNode } from 'react-dom';
  
 export class BetaGraph {
 
-    public vertices: IVertexView[] = [];
-    public edges: IEdgeView[] = [];
+    public vertices: IVertex[] = [];
+    public edges: IEdge[] = [];
     
-    private usedVertices: IVertexView[] = [];
-    private usedEdges: IEdgeView[] = [];
+    private usedVertices: IVertex[] = [];
+    private usedEdges: IEdge[] = [];
     private faces: Cycle[] = [];
     private segments: Segment[] = [];
 
     public private_log_betagraph_6h: string = "";
 
-    constructor( vertices: IVertexView[], edges: IEdgeView[]){
+    constructor( vertices: IVertex[], edges: IEdge[]){
         this.vertices = vertices.slice();
         this.edges = edges.slice();
 
@@ -27,14 +26,14 @@ export class BetaGraph {
         this.optimizeGraph();
     }
 
-    public findWay(startPoint: IVertexView, finishPoint: IVertexView[], graphEdges?: IEdgeView[], blockedWay?: Segment): Segment{
+    public findWay(startPoint: IVertex, finishPoint: IVertex[], graphEdges?: IEdge[], blockedWay?: Segment): Segment{
 
         if (!graphEdges){
             graphEdges = this.edges;
         }
     
         var resultSegment: Segment = new Segment([], [startPoint], startPoint, null);
-        let blackList: IEdgeView[] = [];
+        let blackList: IEdge[] = [];
 
         let nameOfBlockedVertex: string = null;
     
@@ -47,8 +46,8 @@ export class BetaGraph {
 
             let nextEdge = graphEdges.find( edge => !resultSegment.bodyEdges.find(e => e == edge) 
                                                  && !blackList.find(e => e == edge)
-                                                 && (edge.vertexOne == nameOfLastVertex && edge.vertexTwo != nameOfBlockedVertex
-                                                  || edge.vertexTwo == nameOfLastVertex && edge.vertexOne != nameOfBlockedVertex));
+                                                 && (edge.vertexOne.name == nameOfLastVertex && edge.vertexTwo.name != nameOfBlockedVertex
+                                                  || edge.vertexTwo.name == nameOfLastVertex && edge.vertexOne.name != nameOfBlockedVertex));
             
             if (nextEdge == null){
                 if (resultSegment.bodyEdges.length == 0){
@@ -61,12 +60,12 @@ export class BetaGraph {
     
             resultSegment.bodyEdges.push(nextEdge);
             
-            if (nextEdge.vertexOne == nameOfLastVertex){
-                resultSegment.bodyVertices.push(this.vertices.find(v => v.name == nextEdge.vertexTwo));
-                resultSegment.contactPointTwo = this.vertices.find(v => v.name == nextEdge.vertexTwo);
+            if (nextEdge.vertexOne.name == nameOfLastVertex){
+                resultSegment.bodyVertices.push(this.vertices.find(v => v.name == nextEdge.vertexTwo.name));
+                resultSegment.contactPointTwo = this.vertices.find(v => v.name == nextEdge.vertexTwo.name);
             } else {
-                resultSegment.bodyVertices.push(this.vertices.find(v => v.name == nextEdge.vertexOne));
-                resultSegment.contactPointTwo = this.vertices.find(v => v.name == nextEdge.vertexOne);
+                resultSegment.bodyVertices.push(this.vertices.find(v => v.name == nextEdge.vertexOne.name));
+                resultSegment.contactPointTwo = this.vertices.find(v => v.name == nextEdge.vertexOne.name);
             }
     
         } while (!finishPoint.find(v => resultSegment.contactPointTwo.name == v.name))
@@ -80,7 +79,7 @@ export class BetaGraph {
             return [this];
         }
 
-        let blockedVertices: IVertexView[] = [];
+        let blockedVertices: IVertex[] = [];
 
         this.vertices.slice(1).forEach( vertex => {
             let firstWay = this.findWay(this.vertices[0], [vertex]);
@@ -94,12 +93,12 @@ export class BetaGraph {
         }
 
         var newGraph1: BetaGraph = new BetaGraph(this.vertices.filter(v1 => !blockedVertices.find(v2 => v1 == v2)), 
-                                                 this.edges.filter(e => !blockedVertices.find(v2 => e.vertexOne == v2.name) 
-                                                                     && !blockedVertices.find(v2 => e.vertexTwo == v2.name)));
+                                                 this.edges.filter(e => !blockedVertices.find(v2 => e.vertexOne.name == v2.name) 
+                                                                     && !blockedVertices.find(v2 => e.vertexTwo.name == v2.name)));
 
         var newGraph2: BetaGraph = new BetaGraph(blockedVertices, 
-                                                 this.edges.filter(e => blockedVertices.find(v2 => e.vertexOne == v2.name) 
-                                                                     && blockedVertices.find(v2 => e.vertexTwo == v2.name)));
+                                                 this.edges.filter(e => blockedVertices.find(v2 => e.vertexOne.name == v2.name) 
+                                                                     && blockedVertices.find(v2 => e.vertexTwo.name == v2.name)));
         
         return [newGraph1].concat(newGraph2.splitGraphByBridge());
     }
@@ -145,10 +144,10 @@ export class BetaGraph {
             this.usedVertices = this.usedVertices.concat(minValueSegment.bodyVertices.slice(1, minValueSegment.bodyVertices.length - 1));
             this.usedEdges = this.usedEdges.concat(minValueSegment.bodyEdges.slice());
     
-            let tempVerticesForFirstFace : IVertexView[];
-            let tempVerticesForSecondFace : IVertexView[];
-            let tempEdgesForFirstFace : IEdgeView[];
-            let tempEdgesForSecondFace : IEdgeView[];
+            let tempVerticesForFirstFace : IVertex[];
+            let tempVerticesForSecondFace : IVertex[];
+            let tempEdgesForFirstFace : IEdge[];
+            let tempEdgesForSecondFace : IEdge[];
     
             if (contactPointOneIndex < contactPointTwoIndex){
                 tempVerticesForFirstFace = cutFace.vertices.slice(0, contactPointOneIndex);
@@ -207,23 +206,23 @@ export class BetaGraph {
         let str: string = "Vertices" + this.vertices.length + ": ";
         this.vertices.forEach(v => str += v.name);
         str += "Edges" + this.edges.length + ": ";
-        this.edges.forEach(e => str += e.vertexOne + e.vertexTwo + " ");
+        this.edges.forEach(e => str += e.vertexOne.name + e.vertexTwo.name + " ");
         return str;
     }
 
     private optimizeGraph() {
 
-        this.vertices = this.vertices.filter((v: IVertexView) => this.edges.find((e: IEdgeView) => e.vertexOne == v.name || e.vertexTwo == v.name ));
+        this.vertices = this.vertices.filter((v: IVertex) => this.edges.find((e: IEdge) => e.vertexOne.name == v.name || e.vertexTwo.name == v.name ));
     
         let numVerticesDeleted: number = 0;
         let verticesMig; 
         
         do{
-            verticesMig = this.vertices.filter((v: IVertexView) => this.edges.filter((e: IEdgeView) => e.vertexOne  === v.name || e.vertexTwo  === v.name).length >= 2 );
+            verticesMig = this.vertices.filter((v: IVertex) => this.edges.filter((e: IEdge) => e.vertexOne.name  === v.name || e.vertexTwo.name  === v.name).length >= 2 );
             numVerticesDeleted = this.vertices.length - verticesMig.length;
             this.vertices = verticesMig;
             
-            this.edges = this.edges.filter((e: IEdgeView) => this.vertices.find((v: IVertexView) => v.name === e.vertexOne ) && this.vertices.find((v: IVertexView) => v.name === e.vertexTwo ));
+            this.edges = this.edges.filter((e: IEdge) => this.vertices.find((v: IVertex) => v.name === e.vertexOne.name ) && this.vertices.find((v: IVertex) => v.name === e.vertexTwo.name ));
             
         } while(numVerticesDeleted !== 0);
 
@@ -238,42 +237,42 @@ export class BetaGraph {
     
         var resultCycle:Cycle = new Cycle("G0", [this.vertices[0]], null);
     
-        let colored:IVertexView[] = [];
+        let colored:IVertex[] = [];
     
-        let nextEdge = this.edges.find((e: IEdgeView) => e.vertexOne === resultCycle.vertices[0].name || e.vertexTwo === resultCycle.vertices[0].name);
+        let nextEdge = this.edges.find((e: IEdge) => e.vertexOne.name === resultCycle.vertices[0].name || e.vertexTwo.name === resultCycle.vertices[0].name);
         
         if (nextEdge!=null){
             resultCycle.edges = [nextEdge];
     
-            if (nextEdge.vertexOne === resultCycle.vertices[0].name){
-                resultCycle.vertices = resultCycle.vertices.concat([this.vertices.find((v: IVertexView) => v.name === nextEdge.vertexTwo)]);
-                colored = colored.concat([this.vertices.find((v: IVertexView) => v.name === nextEdge.vertexTwo)]);
+            if (nextEdge.vertexOne.name === resultCycle.vertices[0].name){
+                resultCycle.vertices = resultCycle.vertices.concat([this.vertices.find((v: IVertex) => v.name === nextEdge.vertexTwo.name)]);
+                colored = colored.concat([this.vertices.find((v: IVertex) => v.name === nextEdge.vertexTwo.name)]);
             } else 
             {
-                resultCycle.vertices = resultCycle.vertices.concat([this.vertices.find((v: IVertexView) => v.name === nextEdge.vertexOne)]);
-                colored = colored.concat([this.vertices.find((v: IVertexView) => v.name === nextEdge.vertexOne)]);
+                resultCycle.vertices = resultCycle.vertices.concat([this.vertices.find((v: IVertex) => v.name === nextEdge.vertexOne.name)]);
+                colored = colored.concat([this.vertices.find((v: IVertex) => v.name === nextEdge.vertexOne.name)]);
             }
         }
     
         while (resultCycle.vertices[0] !== resultCycle.vertices[resultCycle.vertices.length - 1]){
 
-            nextEdge = this.edges.find((e: IEdgeView) => (e.vertexOne === resultCycle.vertices[resultCycle.vertices.length - 1].name 
-                                                            && e.vertexTwo !== resultCycle.vertices[resultCycle.vertices.length - 2].name 
-                                                            && (colored.find((cv: IVertexView) => cv.name === e.vertexTwo) == null))
-                                                      || (e.vertexTwo === resultCycle.vertices[resultCycle.vertices.length - 1].name 
-                                                            && e.vertexOne !== resultCycle.vertices[resultCycle.vertices.length - 2].name 
-                                                            && (colored.find((cv: IVertexView) => cv.name === e.vertexOne) == null)));
+            nextEdge = this.edges.find((e: IEdge) => (e.vertexOne.name === resultCycle.vertices[resultCycle.vertices.length - 1].name 
+                                                            && e.vertexTwo.name !== resultCycle.vertices[resultCycle.vertices.length - 2].name 
+                                                            && (colored.find((cv: IVertex) => cv.name === e.vertexTwo.name) == null))
+                                                      || (e.vertexTwo.name === resultCycle.vertices[resultCycle.vertices.length - 1].name 
+                                                            && e.vertexOne.name !== resultCycle.vertices[resultCycle.vertices.length - 2].name 
+                                                            && (colored.find((cv: IVertex) => cv.name === e.vertexOne.name) == null)));
 
             if (nextEdge!=null){
                 resultCycle.edges = resultCycle.edges.concat([nextEdge]);
     
-                if (nextEdge.vertexOne === resultCycle.vertices[resultCycle.vertices.length - 1].name){
-                    resultCycle.vertices = resultCycle.vertices.concat([this.vertices.find((v: IVertexView) => v.name === nextEdge.vertexTwo)]);
-                    colored = colored.concat([this.vertices.find((v: IVertexView) => v.name === nextEdge.vertexTwo)]);
+                if (nextEdge.vertexOne.name === resultCycle.vertices[resultCycle.vertices.length - 1].name){
+                    resultCycle.vertices = resultCycle.vertices.concat([this.vertices.find((v: IVertex) => v.name === nextEdge.vertexTwo.name)]);
+                    colored = colored.concat([this.vertices.find((v: IVertex) => v.name === nextEdge.vertexTwo.name)]);
                 } else 
                 {
-                    resultCycle.vertices = resultCycle.vertices.concat([this.vertices.find((v: IVertexView) => v.name === nextEdge.vertexOne)]);
-                    colored = colored.concat([this.vertices.find((v: IVertexView) => v.name === nextEdge.vertexOne)]);
+                    resultCycle.vertices = resultCycle.vertices.concat([this.vertices.find((v: IVertex) => v.name === nextEdge.vertexOne.name)]);
+                    colored = colored.concat([this.vertices.find((v: IVertex) => v.name === nextEdge.vertexOne.name)]);
                 }
             }
         }
@@ -287,20 +286,20 @@ export class BetaGraph {
 
         //Search segments.
         this.edges.filter(nonUsedEdge => !this.usedEdges.find(e => e == nonUsedEdge)).forEach(nonUsedEdge => {
-            if (this.usedVertices.find(v => nonUsedEdge.vertexOne == v.name) && this.usedVertices.find(v => nonUsedEdge.vertexTwo == v.name)){
+            if (this.usedVertices.find(v => nonUsedEdge.vertexOne.name == v.name) && this.usedVertices.find(v => nonUsedEdge.vertexTwo.name == v.name)){
                 this.segments.push(new Segment([nonUsedEdge], 
-                                                [this.vertices.find(v => v.name == nonUsedEdge.vertexOne), 
-                                                 this.vertices.find(v => v.name == nonUsedEdge.vertexTwo)], 
-                                                this.vertices.find(v => v.name == nonUsedEdge.vertexOne), 
-                                                this.vertices.find(v => v.name == nonUsedEdge.vertexTwo)));
+                                                [this.vertices.find(v => v.name == nonUsedEdge.vertexOne.name), 
+                                                 this.vertices.find(v => v.name == nonUsedEdge.vertexTwo.name)], 
+                                                this.vertices.find(v => v.name == nonUsedEdge.vertexOne.name), 
+                                                this.vertices.find(v => v.name == nonUsedEdge.vertexTwo.name)));
             
-            } else if (this.usedVertices.find(v => nonUsedEdge.vertexOne == v.name)){
-                this.segments.push(this.findWay(this.vertices.find(v => v.name == nonUsedEdge.vertexOne), 
+            } else if (this.usedVertices.find(v => nonUsedEdge.vertexOne.name == v.name)){
+                this.segments.push(this.findWay(this.vertices.find(v => v.name == nonUsedEdge.vertexOne.name), 
                                                  this.usedVertices, 
                                                  this.edges.filter(edge => !this.usedEdges.find(e => e == edge))));
             
-            } else if (this.usedVertices.find(v => nonUsedEdge.vertexTwo == v.name)){
-                this.segments.push(this.findWay(this.vertices.find(v => v.name == nonUsedEdge.vertexTwo), 
+            } else if (this.usedVertices.find(v => nonUsedEdge.vertexTwo.name == v.name)){
+                this.segments.push(this.findWay(this.vertices.find(v => v.name == nonUsedEdge.vertexTwo.name), 
                                                  this.usedVertices, 
                                                  this.edges.filter(edge => !this.usedEdges.find(e => e == edge))));
             }
